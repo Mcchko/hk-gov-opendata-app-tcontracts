@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>「T合約員工」查詢系統</title>
+    <!-- Awesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <style>
+        .element-hidden {
+            display: none !important;
+        }
+
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: #1f2937;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: #111827;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group label i {
+            color: #3b82f6;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+
+        .data-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        /* Data Section Styles */
+        .data-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .data-header h2 {
+            color: #111827;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .data-header .subtitle {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .data-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3b82f6;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .accordion-container {
+            margin-top: 20px;
+        }
+
+        .data-group {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .data-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-header-group {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-header-group.active {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        }
+
+        .data-header-group i {
+            transition: transform 0.3s ease;
+        }
+
+        .data-header-group.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .data-content {
+            padding: 20px;
+            background: white;
+        }
+
+        .data-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .data-item {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .data-item:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+        }
+
+        .data-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .data-row {
+            display: flex;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #374151;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .data-value {
+            flex: 1;
+            color: #6b7280;
+            word-break: break-word;
+        }
+
+        .data-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-salary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-rate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-count {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .data-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+                background: #1e3a8a;
+            }
+
+            .container {
+                gap: 16px;
+            }
+
+            .header {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .data-section {
+                max-height: 400px;
+                padding: 15px;
+            }
+
+            .data-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .data-info {
+                grid-template-columns: 1fr;
+            }
+
+            .data-row {
+                flex-direction: column;
+                margin-bottom: 12px;
+            }
+
+            .data-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .data-header-group {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Desktop Enhancements */
+        @media (min-width: 1200px) {
+            .data-section {
+                max-height: 65vh;
+            }
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 1px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            background: #e5e7eb;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>「T合約員工」查詢系統</h1>
+            <p class="subtitle">T合約員工統計資料查詢系統</p>
+        </header>
+        <section class="form-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="dataSource">
+                        <i class="fas fa-database"></i>
+                        數據類型
+                    </label>
+                    <select id="dataSource" class="form-select">
+                        <option value="salary">每月薪酬</option>
+                        <option value="rate">承辦商的服務費</option>
+                        <option value="count">員工數量</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="yearSelect">
+                        <i class="fas fa-calendar"></i>
+                        年份篩選
+                    </label>
+                    <select id="yearSelect" class="form-select">
+                        <option value="">全部年份</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-filter"></i>
+                        篩選選項
+                    </label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cacheEnabled" checked>
+                            <label for="cacheEnabled">啟用緩存</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="autoRefresh" checked>
+                            <label for="autoRefresh">自動更新</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="loadData()">
+                    <i class="fas fa-sync-alt"></i>
+                    載入數據
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearCache()">
+                    <i class="fas fa-trash-alt"></i>
+                    清除緩存
+                </button>
+            </div>
+        </section>
+        <main class="main-content">
+            <section class="data-section">
+                <div class="tab-navigation">
+                    <button class="tab-button active" onclick="switchTab('salary')">
+                        <i class="fas fa-money-bill-wave"></i>
+                        每月薪酬
+                    </button>
+                    <button class="tab-button" onclick="switchTab('rate')">
+                        <i class="fas fa-percentage"></i>
+                        服務費調整
+                    </button>
+                    <button class="tab-button" onclick="switchTab('count')">
+                        <i class="fas fa-users"></i>
+                        員工數量
+                    </button>
+                </div>
+
+                <div id="tab-salary" class="tab-content active">
+                    <div class="data-header">
+                        <h2>每月薪酬統計</h2>
+                        <p class="subtitle">政府委聘Ｔ合約員工的每月平均人均開支</p>
+                    </div>
+                    <div class="data-stats">
+                        <div class="stat-item">
+                            <span id="total-salary-years" class="stat-value">0</span>
+                            <span class="stat-label">統計年份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-positions" class="stat-value">0</span>
+                            <span class="stat-label">職位類別</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="avg-salary" class="stat-value">0</span>
+                            <span class="stat-label">平均開支 (HKD)</span>
+                        </div>
+                    </div>
+                    <div class="accordion-container" id="salary-accordion">
+                        <div class="no-data">
+                            <i class="fas fa-chart-line"></i>
+                            <p>請點擊「載入數據」按鈕查詢薪酬資料</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-rate" class="tab-content">
+                    <div class="data-header">
+                        <h2>承辦商的服務費調整</h2>
+                        <p class="subtitle">T合約承辦商的服務費調整百分比</p>
+                    </div>
+                    <div class="data-stats">
+                        <div class="stat-item">
+                            <span id="total-rate-years" class="stat-value">0</span>
+                            <span class="stat-label">統計年份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-adjustments" class="stat-value">0</span>
+                            <span class="stat-label">調整記錄</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="avg-rate" class="stat-value">0%</span>
+                            <span class="stat-label">平均調整</span>
+                        </div>
+                    </div>
+                    <div class="accordion-container" id="rate-accordion">
+                        <div class="no-data">
+                            <i class="fas fa-chart-pie"></i>
+                            <p>請點擊「載入數據」按鈕查詢服務費資料</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-count" class="tab-content">
+                    <div class="data-header">
+                        <h2>員工數量統計</h2>
+                        <p class="subtitle">政府聘用T合約員工的總數統計</p>
+                    </div>
+                    <div class="data-stats">
+                        <div class="stat-item">
+                            <span id="total-count-years" class="stat-value">0</span>
+                            <span class="stat-label">統計年份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-months" class="stat-value">0</span>
+                            <span class="stat-label">月份記錄</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="max-employees" class="stat-value">0</span>
+                            <span class="stat-label">最高員工數</span>
+                        </div>
+                    </div>
+                    <div class="accordion-container" id="count-accordion">
+                        <div class="no-data">
+                            <i class="fas fa-user-friends"></i>
+                            <p>請點擊「載入數據」按鈕查詢員工數量資料</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="footer">
+            <p>T合約員工查詢系統 <br/> 資料來源: 香港政府數字政策辦公室<span id="last-updated" style="display: none"></span></p>
+        </footer>
+    </div>
+    <script>
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
+
+        // 數據緩存
+        const CACHE = {
+            salary: null,
+            rate: null,
+            count: null,
+            lastUpdated: {
+                salary: null,
+                rate: null,
+                count: null
+            }
+        };
+
+        // API URL
+        const API_URLS = {
+            salary: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-statistics-tc.csv',
+            rate: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-rate-adj-tc.csv',
+            count: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-no-tc.csv'
+        };
+
+        let isTerminated = false;
+
+        // 當前選中的數據類型
+        let currentDataSource = 'salary';
+
+        // 初始化應用
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLastUpdatedTime();
+            initializeYearFilter();
+            loadCachedData();
+        });
+
+        // 初始化年份篩選
+        function initializeYearFilter() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('yearSelect');
+
+            // 添加最近5年
+            for (let i = currentYear; i >= currentYear - 5; i--) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + '年';
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // 更新最後更新時間
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString('zh-HK', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('last-updated').textContent = formattedTime;
+        }
+
+        // 切換標籤頁
+        function switchTab(tabName) {
+            // 更新按鈕狀態
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // 更新內容區域
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // 更新數據類型選擇
+            document.getElementById('dataSource').value = tabName;
+            currentDataSource = tabName;
+        }
+
+        // 載入緩存數據
+        function loadCachedData() {
+            const cacheEnabled = document.getElementById('cacheEnabled').checked;
+
+            if (!cacheEnabled) return;
+
+            ['salary', 'rate', 'count'].forEach(dataType => {
+                const cached = localStorage.getItem(`t_contract_${dataType}`);
+                if (cached) {
+                    try {
+                        const data = JSON.parse(cached);
+                        CACHE[dataType] = data.data;
+                        CACHE.lastUpdated[dataType] = data.timestamp;
+                        if (dataType === currentDataSource) {
+                            updateUI(dataType, data.data);
+                        }
+                    } catch (e) {
+                        console.error('解析緩存數據失敗:', e);
+                    }
+                }
+            });
+        }
+
+        // 清除緩存
+        function clearCache() {
+            if (confirm('確定要清除所有緩存數據嗎？')) {
+                ['salary', 'rate', 'count'].forEach(dataType => {
+                    localStorage.removeItem(`t_contract_${dataType}`);
+                    CACHE[dataType] = null;
+                    CACHE.lastUpdated[dataType] = null;
+                });
+
+                // 重置UI
+                document.getElementById(`${currentDataSource}-accordion`).innerHTML =
+                    '<div class="no-data"><i class="fas fa-chart-line"></i><p>緩存已清除，請重新載入數據</p></div>';
+
+                showNotification('緩存數據已清除', 'success');
+            }
+        }
+
+        // 載入數據
+        async function loadData() {
+            const dataType = document.getElementById('dataSource').value;
+            const yearFilter = document.getElementById('yearSelect').value;
+            const cacheEnabled = document.getElementById('cacheEnabled').checked;
+
+            // 檢查緩存
+            if (cacheEnabled && CACHE[dataType]) {
+                const cachedAge = Date.now() - CACHE.lastUpdated[dataType];
+                const cacheMaxAge = 30 * 60 * 1000; // 30分鐘緩存
+
+                if (cachedAge < cacheMaxAge) {
+                    updateUI(dataType, CACHE[dataType], yearFilter);
+                    showNotification('使用緩存數據', 'info');
+                    return;
+                }
+            }
+
+            // 顯示加載狀態
+            const container = document.getElementById(`${dataType}-accordion`);
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在載入${getDataTypeName(dataType)}數據...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${PROXY_URL}/${API_URLS[dataType]}`);
+
+                if (!response.ok) {
+                    if (!isTerminated) {
+                        isTerminated = true;
+                        alert(`請先啟用 Proxy：${PROXY_URL}`);
+                        window.open(PROXY_URL, "_blank");
+                    }
+                    return;
+                }
+
+                const csvText = await response.text();
+                const data = parseCSV(csvText, dataType);
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>未找到相關數據</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">請檢查數據來源或稍後再試</p>
+                        </div>
+                    `;
+                    showNotification('未找到相關數據', 'info');
+                    return;
+                }
+
+                // 保存到緩存
+                if (cacheEnabled) {
+                    localStorage.setItem(`t_contract_${dataType}`, JSON.stringify({
+                        data: data,
+                        timestamp: Date.now()
+                    }));
+                }
+
+                CACHE[dataType] = data;
+                CACHE.lastUpdated[dataType] = Date.now();
+
+                updateUI(dataType, data, yearFilter);
+                updateLastUpdatedTime();
+                showNotification(`成功載入 ${data.length} 筆${getDataTypeName(dataType)}數據`, 'success');
+
+            } catch (error) {
+                console.error('載入數據時出錯:', error);
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>載入數據時出錯</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+                    </div>
+                `;
+                showNotification('載入數據時出錯，請稍後再試', 'error');
+            }
+        }
+
+        // 解析CSV數據
+        function parseCSV(csvText, dataType) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const values = line.split(',').map(v => v.trim());
+                const item = {};
+
+                headers.forEach((header, index) => {
+                    if (values[index]) {
+                        item[header] = values[index];
+                    }
+                });
+
+                if (Object.keys(item).length > 0) {
+                    data.push(item);
+                }
+            }
+
+            return data;
+        }
+
+        // 更新UI
+        function updateUI(dataType, data, yearFilter = '') {
+            let filteredData = data;
+
+            // 應用年份篩選
+            if (yearFilter) {
+                filteredData = data.filter(item => item.年份 === yearFilter || item.年份 === yearFilter.toString());
+            }
+
+            // 根據數據類型更新UI
+            switch (dataType) {
+                case 'salary':
+                    updateSalaryUI(filteredData);
+                    break;
+                case 'rate':
+                    updateRateUI(filteredData);
+                    break;
+                case 'count':
+                    updateCountUI(filteredData);
+                    break;
+            }
+
+            // 更新標籤頁按鈕
+            switchTab(dataType);
+        }
+
+        // 更新薪酬數據UI
+        function updateSalaryUI(data) {
+            const container = document.getElementById('salary-accordion');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fas fa-chart-line"></i><p>沒有薪酬數據</p></div>';
+                document.getElementById('total-salary-years').textContent = '0';
+                document.getElementById('total-positions').textContent = '0';
+                document.getElementById('avg-salary').textContent = '0';
+                return;
+            }
+
+            // 分組數據
+            const groupedData = {};
+            const years = new Set();
+            const positions = new Set();
+            let totalSalary = 0;
+            let salaryCount = 0;
+
+            data.forEach(item => {
+                const year = item.年份 || '未知年份';
+                const period = item.期間 || '未知期間';
+                const position = item.職位類別 || '未知職位';
+                const salary = parseFloat(item['政府委聘Ｔ合約員工的每月平均人均開支 (調低至最接近的千元（港幣）)']) || 0;
+
+                years.add(year);
+                positions.add(position);
+                totalSalary += salary;
+                salaryCount++;
+
+                const key = `${year} (${period})`;
+                if (!groupedData[key]) {
+                    groupedData[key] = [];
+                }
+                groupedData[key].push({
+                    position: position,
+                    salary: salary
+                });
+            });
+
+            // 更新統計
+            document.getElementById('total-salary-years').textContent = years.size;
+            document.getElementById('total-positions').textContent = positions.size;
+            document.getElementById('avg-salary').textContent = salaryCount > 0 ?
+                Math.round(totalSalary / salaryCount).toLocaleString() : '0';
+
+            // 生成HTML
+            let accordionHTML = '';
+            Object.keys(groupedData).sort((a, b) => b.localeCompare(a)).forEach((groupKey, index) => {
+                const items = groupedData[groupKey];
+
+                accordionHTML += `
+                    <div class="data-group">
+                        <div class="data-header-group" onclick="toggleDataGroup('salary', ${index})">
+                            <div>
+                                <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
+                                <span>${groupKey} (${items.length} 個職位)</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="salary-group-${index}" class="data-content" style="display: none;">
+                            <div class="data-meta" style="margin-bottom: 15px;">
+                                <span class="data-badge badge-salary">
+                                    <i class="fas fa-money-bill-wave" style="margin-right: 4px;"></i>
+                                    職位類別: ${new Set(items.map(item => item.position)).size}
+                                </span>
+                            </div>
+                            <div class="data-list">
+                `;
+
+                items.sort((a, b) => b.salary - a.salary).forEach(item => {
+                    accordionHTML += `
+                        <div class="data-item">
+                            <div class="data-info">
+                                <div>
+                                    <div class="data-row">
+                                        <div class="data-label">職位類別:</div>
+                                        <div class="data-value">${item.position}</div>
+                                    </div>
+                                    <div class="data-row">
+                                        <div class="data-label">每月平均開支:</div>
+                                        <div class="data-value">HKD ${item.salary.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                accordionHTML += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = accordionHTML;
+        }
+
+        // 更新服務費數據UI
+        function updateRateUI(data) {
+            const container = document.getElementById('rate-accordion');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fas fa-chart-pie"></i><p>沒有服務費調整數據</p></div>';
+                document.getElementById('total-rate-years').textContent = '0';
+                document.getElementById('total-adjustments').textContent = '0';
+                document.getElementById('avg-rate').textContent = '0%';
+                return;
+            }
+
+            // 分組數據
+            const groupedData = {};
+            const years = new Set();
+            let totalRate = 0;
+            let rateCount = 0;
+
+            data.forEach(item => {
+                const year = item.年份 || '未知年份';
+                const effectiveDate = item.生效日期 || '未知日期';
+                const rate = parseFloat(item['T合約承辦商的服務費調整百份比'].replace('%', '')) || 0;
+
+                years.add(year);
+                totalRate += rate;
+                rateCount++;
+
+                if (!groupedData[year]) {
+                    groupedData[year] = [];
+                }
+                groupedData[year].push({
+                    effectiveDate: effectiveDate,
+                    rate: rate
+                });
+            });
+
+            // 更新統計
+            document.getElementById('total-rate-years').textContent = years.size;
+            document.getElementById('total-adjustments').textContent = data.length;
+            document.getElementById('avg-rate').textContent = rateCount > 0 ?
+                (totalRate / rateCount).toFixed(2) + '%' : '0%';
+
+            // 生成HTML
+            let accordionHTML = '';
+            Object.keys(groupedData).sort((a, b) => b - a).forEach((year, index) => {
+                const items = groupedData[year];
+
+                accordionHTML += `
+                    <div class="data-group">
+                        <div class="data-header-group" onclick="toggleDataGroup('rate', ${index})">
+                            <div>
+                                <i class="fas fa-calendar" style="margin-right: 8px;"></i>
+                                <span>${year}年 (${items.length} 次調整)</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="rate-group-${index}" class="data-content" style="display: none;">
+                            <div class="data-meta" style="margin-bottom: 15px;">
+                                <span class="data-badge badge-rate">
+                                    <i class="fas fa-percentage" style="margin-right: 4px;"></i>
+                                    平均調整: ${(items.reduce((sum, item) => sum + item.rate, 0) / items.length).toFixed(2)}%
+                                </span>
+                            </div>
+                            <div class="data-list">
+                `;
+
+                items.sort((a, b) => {
+                    const dateA = parseDate(a.effectiveDate);
+                    const dateB = parseDate(b.effectiveDate);
+                    return dateB - dateA;
+                }).forEach(item => {
+                    accordionHTML += `
+                        <div class="data-item">
+                            <div class="data-info">
+                                <div>
+                                    <div class="data-row">
+                                        <div class="data-label">生效日期:</div>
+                                        <div class="data-value">${item.effectiveDate}</div>
+                                    </div>
+                                    <div class="data-row">
+                                        <div class="data-label">調整百分比:</div>
+                                        <div class="data-value">${item.rate}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                accordionHTML += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = accordionHTML;
+        }
+
+        // 更新員工數量數據UI
+        function updateCountUI(data) {
+            const container = document.getElementById('count-accordion');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fas fa-user-friends"></i><p>沒有員工數量數據</p></div>';
+                document.getElementById('total-count-years').textContent = '0';
+                document.getElementById('total-months').textContent = '0';
+                document.getElementById('max-employees').textContent = '0';
+                return;
+            }
+
+            // 分組數據
+            const groupedData = {};
+            const years = new Set();
+            let maxEmployees = 0;
+
+            data.forEach(item => {
+                const year = item.年份 || '未知年份';
+                const month = item.月份 || '未知月份';
+                const total = parseInt(item['政府聘用T合約員工的總數']) || 0;
+                const digitalOffice = parseInt(item['數字政策辦公室聘用的T合約員工數目']) || 0;
+                const otherDepartments = parseInt(item['其他局／部門聘用的T合約員工數目']) || 0;
+
+                years.add(year);
+                maxEmployees = Math.max(maxEmployees, total);
+
+                const key = `${year}年${month}月`;
+                groupedData[key] = {
+                    year: year,
+                    month: month,
+                    total: total,
+                    digitalOffice: digitalOffice,
+                    otherDepartments: otherDepartments
+                };
+            });
+
+            // 更新統計
+            document.getElementById('total-count-years').textContent = years.size;
+            document.getElementById('total-months').textContent = data.length;
+            document.getElementById('max-employees').textContent = maxEmployees.toLocaleString();
+
+            // 生成HTML
+            let accordionHTML = '';
+            const sortedKeys = Object.keys(groupedData).sort((a, b) => {
+                const dateA = groupedData[a];
+                const dateB = groupedData[b];
+                return (parseInt(dateB.year) - parseInt(dateA.year)) ||
+                    (parseInt(dateB.month) - parseInt(dateA.month));
+            });
+
+            sortedKeys.forEach((key, index) => {
+                const item = groupedData[key];
+
+                accordionHTML += `
+                    <div class="data-group">
+                        <div class="data-header-group" onclick="toggleDataGroup('count', ${index})">
+                            <div>
+                                <i class="fas fa-calendar-check" style="margin-right: 8px;"></i>
+                                <span>${key}</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="count-group-${index}" class="data-content" style="display: none;">
+                            <div class="data-meta" style="margin-bottom: 15px;">
+                                <span class="data-badge badge-count">
+                                    <i class="fas fa-users" style="margin-right: 4px;"></i>
+                                    總人數: ${item.total.toLocaleString()}
+                                </span>
+                            </div>
+                            <div class="data-list">
+                                <div class="data-item">
+                                    <div class="data-info">
+                                        <div>
+                                            <div class="data-row">
+                                                <div class="data-label">年份:</div>
+                                                <div class="data-value">${item.year}</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">月份:</div>
+                                                <div class="data-value">${item.month}</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="data-row">
+                                                <div class="data-label">總員工人數:</div>
+                                                <div class="data-value">${item.total.toLocaleString()}</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">數字政策辦公室:</div>
+                                                <div class="data-value">${item.digitalOffice.toLocaleString()}</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">其他局/部門:</div>
+                                                <div class="data-value">${item.otherDepartments.toLocaleString()}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = accordionHTML;
+        }
+
+        // 切換數據群組
+        function toggleDataGroup(dataType, index) {
+            const content = document.getElementById(`${dataType}-group-${index}`);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.fa-chevron-down, .fa-chevron-up');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                header.classList.add('active');
+                if (icon) icon.className = 'fas fa-chevron-up';
+            } else {
+                content.style.display = 'none';
+                header.classList.remove('active');
+                if (icon) icon.className = 'fas fa-chevron-down';
+            }
+        }
+
+        // 輔助函數：解析日期
+        function parseDate(dateStr) {
+            if (!dateStr) return new Date(0);
+
+            // 嘗試解析DD.MM.YYYY格式
+            const parts = dateStr.split('.');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+
+            return new Date(dateStr);
+        }
+
+        // 輔助函數：獲取數據類型名稱
+        function getDataTypeName(dataType) {
+            switch (dataType) {
+                case 'salary': return '薪酬';
+                case 'rate': return '服務費調整';
+                case 'count': return '員工數量';
+                default: return '數據';
+            }
+        }
+
+        // 顯示通知
+        function showNotification(message, type = 'info') {
+            // 移除現有通知
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // 創建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            // 添加到文檔
+            document.body.appendChild(notification);
+
+            // 3秒後移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // 自動更新數據（如果啟用）
+        let autoRefreshInterval = null;
+        document.getElementById('autoRefresh').addEventListener('change', function () {
+            if (this.checked) {
+                autoRefreshInterval = setInterval(() => {
+                    if (CACHE[currentDataSource]) {
+                        const cachedAge = Date.now() - CACHE.lastUpdated[currentDataSource];
+                        const cacheMaxAge = 30 * 60 * 1000; // 30分鐘
+
+                        if (cachedAge > cacheMaxAge) {
+                            loadData();
+                        }
+                    }
+                }, 60000); // 每分鐘檢查一次
+            } else if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        });
+
+        // 初始化教程
+        if (!localStorage.getItem('tContractTutorialShown')) {
+            setTimeout(() => {
+                alert("歡迎使用「T合約員工」查詢系統！\n\n• 選擇數據類型查看不同統計資料\n• 可使用年份篩選查看特定年份數據\n• 啟用緩存可加快載入速度\n• 點擊標題可展開/收起詳細資訊\n• 系統會自動從香港政府數字政策辦公室獲取最新數據");
+                localStorage.setItem('tContractTutorialShown', 'true');
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
