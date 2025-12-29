@@ -372,6 +372,11 @@
             color: #166534;
         }
 
+        .badge-benefit {
+            background: #f3e8ff;
+            color: #5b21b6;
+        }
+
         .data-meta {
             display: flex;
             flex-wrap: wrap;
@@ -601,6 +606,34 @@
         .tab-content.active {
             display: block;
         }
+
+        /* Benefit Grid */
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .benefit-item {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .benefit-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .benefit-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
     </style>
 </head>
 
@@ -608,58 +641,7 @@
     <div class="container">
         <header class="header">
             <h1>「T合約員工」查詢系統</h1>
-            <p class="subtitle">T合約員工統計資料查詢系統</p>
         </header>
-        <section class="form-section">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="dataSource">
-                        <i class="fas fa-database"></i>
-                        數據類型
-                    </label>
-                    <select id="dataSource" class="form-select">
-                        <option value="salary">每月薪酬</option>
-                        <option value="rate">承辦商的服務費</option>
-                        <option value="count">員工數量</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="yearSelect">
-                        <i class="fas fa-calendar"></i>
-                        年份篩選
-                    </label>
-                    <select id="yearSelect" class="form-select">
-                        <option value="">全部年份</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <i class="fas fa-filter"></i>
-                        篩選選項
-                    </label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="cacheEnabled" checked>
-                            <label for="cacheEnabled">啟用緩存</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="autoRefresh" checked>
-                            <label for="autoRefresh">自動更新</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-primary" onclick="loadData()">
-                    <i class="fas fa-sync-alt"></i>
-                    載入數據
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="clearCache()">
-                    <i class="fas fa-trash-alt"></i>
-                    清除緩存
-                </button>
-            </div>
-        </section>
         <main class="main-content">
             <section class="data-section">
                 <div class="tab-navigation">
@@ -675,12 +657,16 @@
                         <i class="fas fa-users"></i>
                         員工數量
                     </button>
+                    <button class="tab-button" onclick="switchTab('benefit')">
+                        <i class="fas fa-heart"></i>
+                        員工福利
+                    </button>
                 </div>
 
                 <div id="tab-salary" class="tab-content active">
                     <div class="data-header">
                         <h2>每月薪酬統計</h2>
-                        <p class="subtitle">政府委聘Ｔ合約員工的每月平均人均開支</p>
+                        <p class="subtitle">政府委聘Ｔ合約員工的每月平均人均開支 (調低至最接近的千元（港幣）)</p>
                     </div>
                     <div class="data-stats">
                         <div class="stat-item">
@@ -757,24 +743,102 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="tab-benefit" class="tab-content">
+                    <div class="data-header">
+                        <h2>員工福利統計</h2>
+                        <p class="subtitle">T合約承辦商提供的員工福利統計</p>
+                    </div>
+                    <div class="data-stats">
+                        <div class="stat-item">
+                            <span id="total-benefit-years" class="stat-value">0</span>
+                            <span class="stat-label">統計年份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-benefit-records" class="stat-value">0</span>
+                            <span class="stat-label">月份記錄</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="avg-providers" class="stat-value">0</span>
+                            <span class="stat-label">平均承辦商</span>
+                        </div>
+                    </div>
+                    <div class="accordion-container" id="benefit-accordion">
+                        <div class="no-data">
+                            <i class="fas fa-heart"></i>
+                            <p>請點擊「載入數據」按鈕查詢員工福利資料</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="form-section">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dataSource">
+                            <i class="fas fa-database"></i>
+                            數據類型
+                        </label>
+                        <select id="dataSource" class="form-select" onchange="switchTab(this.value)">
+                            <option value="salary">每月薪酬</option>
+                            <option value="rate">承辦商的服務費</option>
+                            <option value="count">員工數量</option>
+                            <option value="benefit">員工福利</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="yearSelect">
+                            <i class="fas fa-calendar"></i>
+                            年份篩選
+                        </label>
+                        <select id="yearSelect" class="form-select">
+                            <option value="">全部年份</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-filter"></i>
+                            篩選選項
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cacheEnabled" checked>
+                                <label for="cacheEnabled">啟用緩存</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="autoRefresh">
+                                <label for="autoRefresh">自動更新</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i>
+                        載入數據
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearCache()">
+                        <i class="fas fa-trash-alt"></i>
+                        清除緩存
+                    </button>
+                </div>
             </section>
         </main>
         <footer class="footer">
-            <p>T合約員工查詢系統 <br/> 資料來源: 香港政府數字政策辦公室<span id="last-updated" style="display: none"></span></p>
+            <p>T合約員工查詢系統<br />資料來源: 香港政府數字政策辦公室<span id="last-updated" style="display:none"></span></p>
         </footer>
     </div>
     <script>
-        const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
-
         // 數據緩存
         const CACHE = {
             salary: null,
             rate: null,
             count: null,
+            benefit: null,
             lastUpdated: {
                 salary: null,
                 rate: null,
-                count: null
+                count: null,
+                benefit: null
             }
         };
 
@@ -782,19 +846,35 @@
         const API_URLS = {
             salary: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-statistics-tc.csv',
             rate: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-rate-adj-tc.csv',
-            count: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-no-tc.csv'
+            count: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-no-tc.csv',
+            benefit: 'https://www.digitalpolicy.gov.hk/open_data/contract_staff_services/t-contract-remuneration-tc.csv'
         };
 
-        let isTerminated = false;
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 
         // 當前選中的數據類型
         let currentDataSource = 'salary';
+        let autoRefreshInterval = null;
+
+        let isTerminated = false;
 
         // 初始化應用
         document.addEventListener('DOMContentLoaded', function () {
             updateLastUpdatedTime();
             initializeYearFilter();
             loadCachedData();
+
+            // 監聽下拉選單變化
+            document.getElementById('dataSource').addEventListener('change', function () {
+                switchTab(this.value);
+            });
+
+            // 監聽年份篩選變化
+            document.getElementById('yearSelect').addEventListener('change', function () {
+                if (CACHE[currentDataSource]) {
+                    updateUI(currentDataSource, CACHE[currentDataSource]);
+                }
+            });
         });
 
         // 初始化年份篩選
@@ -828,6 +908,13 @@
 
         // 切換標籤頁
         function switchTab(tabName) {
+            loadData();
+
+            currentDataSource = tabName;
+
+            // 更新下拉選單
+            document.getElementById('dataSource').value = tabName;
+
             // 更新按鈕狀態
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
@@ -840,9 +927,10 @@
             });
             document.getElementById(`tab-${tabName}`).classList.add('active');
 
-            // 更新數據類型選擇
-            document.getElementById('dataSource').value = tabName;
-            currentDataSource = tabName;
+            // 如果有緩存數據，顯示該數據
+            if (CACHE[tabName]) {
+                updateUI(tabName, CACHE[tabName]);
+            }
         }
 
         // 載入緩存數據
@@ -851,16 +939,13 @@
 
             if (!cacheEnabled) return;
 
-            ['salary', 'rate', 'count'].forEach(dataType => {
+            ['salary', 'rate', 'count', 'benefit'].forEach(dataType => {
                 const cached = localStorage.getItem(`t_contract_${dataType}`);
                 if (cached) {
                     try {
                         const data = JSON.parse(cached);
                         CACHE[dataType] = data.data;
                         CACHE.lastUpdated[dataType] = data.timestamp;
-                        if (dataType === currentDataSource) {
-                            updateUI(dataType, data.data);
-                        }
                     } catch (e) {
                         console.error('解析緩存數據失敗:', e);
                     }
@@ -871,24 +956,53 @@
         // 清除緩存
         function clearCache() {
             if (confirm('確定要清除所有緩存數據嗎？')) {
-                ['salary', 'rate', 'count'].forEach(dataType => {
+                ['salary', 'rate', 'count', 'benefit'].forEach(dataType => {
                     localStorage.removeItem(`t_contract_${dataType}`);
                     CACHE[dataType] = null;
                     CACHE.lastUpdated[dataType] = null;
                 });
 
-                // 重置UI
-                document.getElementById(`${currentDataSource}-accordion`).innerHTML =
+                // 重置當前顯示的UI
+                const container = document.getElementById(`${currentDataSource}-accordion`);
+                container.innerHTML =
                     '<div class="no-data"><i class="fas fa-chart-line"></i><p>緩存已清除，請重新載入數據</p></div>';
+
+                // 重置統計數據
+                resetStatistics(currentDataSource);
 
                 showNotification('緩存數據已清除', 'success');
             }
         }
 
+        // 重置統計數據
+        function resetStatistics(dataType) {
+            switch (dataType) {
+                case 'salary':
+                    document.getElementById('total-salary-years').textContent = '0';
+                    document.getElementById('total-positions').textContent = '0';
+                    document.getElementById('avg-salary').textContent = '0';
+                    break;
+                case 'rate':
+                    document.getElementById('total-rate-years').textContent = '0';
+                    document.getElementById('total-adjustments').textContent = '0';
+                    document.getElementById('avg-rate').textContent = '0%';
+                    break;
+                case 'count':
+                    document.getElementById('total-count-years').textContent = '0';
+                    document.getElementById('total-months').textContent = '0';
+                    document.getElementById('max-employees').textContent = '0';
+                    break;
+                case 'benefit':
+                    document.getElementById('total-benefit-years').textContent = '0';
+                    document.getElementById('total-benefit-records').textContent = '0';
+                    document.getElementById('avg-providers').textContent = '0';
+                    break;
+            }
+        }
+
         // 載入數據
         async function loadData() {
-            const dataType = document.getElementById('dataSource').value;
-            const yearFilter = document.getElementById('yearSelect').value;
+            const dataType = currentDataSource;
             const cacheEnabled = document.getElementById('cacheEnabled').checked;
 
             // 檢查緩存
@@ -897,7 +1011,7 @@
                 const cacheMaxAge = 30 * 60 * 1000; // 30分鐘緩存
 
                 if (cachedAge < cacheMaxAge) {
-                    updateUI(dataType, CACHE[dataType], yearFilter);
+                    updateUI(dataType, CACHE[dataType]);
                     showNotification('使用緩存數據', 'info');
                     return;
                 }
@@ -914,7 +1028,6 @@
 
             try {
                 const response = await fetch(`${PROXY_URL}/${API_URLS[dataType]}`);
-
                 if (!response.ok) {
                     if (!isTerminated) {
                         isTerminated = true;
@@ -950,7 +1063,7 @@
                 CACHE[dataType] = data;
                 CACHE.lastUpdated[dataType] = Date.now();
 
-                updateUI(dataType, data, yearFilter);
+                updateUI(dataType, data);
                 updateLastUpdatedTime();
                 showNotification(`成功載入 ${data.length} 筆${getDataTypeName(dataType)}數據`, 'success');
 
@@ -967,42 +1080,101 @@
             }
         }
 
-        // 解析CSV數據
+        // 解析CSV數據 - 改進版，處理各種格式
         function parseCSV(csvText, dataType) {
             const lines = csvText.trim().split('\n');
             if (lines.length < 2) return [];
 
-            const headers = lines[0].split(',').map(h => h.trim());
+            // 檢測分隔符 - 優先檢測逗號，因為CSV通常用逗號分隔
+            let delimiter = ',';
+
+            // 檢查第一行是否有中文字符，如果有，嘗試使用制表符
+            const firstLine = lines[0];
+            if (firstLine.includes('\t')) {
+                delimiter = '\t';
+            }
+
+            // 處理CSV頭部
+            let headers = [];
+            let headerLine = lines[0];
+
+            // 嘗試使用不同的分隔符解析
+            if (delimiter === ',') {
+                // 處理包含引號的CSV
+                if (headerLine.includes('"')) {
+                    headers = parseCSVLine(headerLine);
+                } else {
+                    headers = headerLine.split(delimiter).map(h => h.trim());
+                }
+            } else {
+                headers = headerLine.split(delimiter).map(h => h.trim());
+            }
+
             const data = [];
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
 
-                const values = line.split(',').map(v => v.trim());
-                const item = {};
+                let values = [];
 
+                if (delimiter === ',') {
+                    if (line.includes('"')) {
+                        values = parseCSVLine(line);
+                    } else {
+                        values = line.split(delimiter).map(v => v.trim());
+                    }
+                } else {
+                    values = line.split(delimiter).map(v => v.trim());
+                }
+
+                const item = {};
                 headers.forEach((header, index) => {
-                    if (values[index]) {
+                    if (values[index] !== undefined) {
                         item[header] = values[index];
+                    } else {
+                        // 如果列數不匹配，嘗試使用特殊處理
+                        item[header] = '';
                     }
                 });
 
                 if (Object.keys(item).length > 0) {
-                    data.push(item);
+                    // 為每個數據類型添加標準化的字段名
+                    if (dataType === 'benefit') {
+                        // 確保福利數據有標準化字段名
+                        item.year = item.year || item['年份'] || '';
+                        item.month = item.month || item['月份'] || '';
+                    } else if (dataType === 'salary') {
+                        item.year = item.year || item['年份'] || '';
+                        item.period = item.period || item['期間'] || '';
+                    } else if (dataType === 'rate') {
+                        item.year = item.year || item['年份'] || '';
+                    } else if (dataType === 'count') {
+                        item.year = item.year || item['年份'] || '';
+                        item.month = item.month || item['月份'] || '';
+                    }
+
+                    // 過濾空行
+                    const hasData = Object.values(item).some(value => value && value.trim() !== '');
+                    if (hasData) {
+                        data.push(item);
+                    }
                 }
             }
 
             return data;
         }
-
         // 更新UI
-        function updateUI(dataType, data, yearFilter = '') {
+        function updateUI(dataType, data) {
+            const yearFilter = document.getElementById('yearSelect').value;
             let filteredData = data;
 
             // 應用年份篩選
             if (yearFilter) {
-                filteredData = data.filter(item => item.年份 === yearFilter || item.年份 === yearFilter.toString());
+                filteredData = data.filter(item => {
+                    const itemYear = item.year || item['年份'] || '';
+                    return itemYear === yearFilter || itemYear === yearFilter.toString();
+                });
             }
 
             // 根據數據類型更新UI
@@ -1016,13 +1188,45 @@
                 case 'count':
                     updateCountUI(filteredData);
                     break;
+                case 'benefit':
+                    updateBenefitUI(filteredData);
+                    break;
             }
-
-            // 更新標籤頁按鈕
-            switchTab(dataType);
         }
 
-        // 更新薪酬數據UI
+        // 輔助函數：解析包含引號的CSV行
+        function parseCSVLine(line) {
+            const values = [];
+            let currentValue = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // 處理轉義的引號
+                        currentValue += '"';
+                        i++; // 跳過下一個引號
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    values.push(currentValue.trim());
+                    currentValue = '';
+                } else {
+                    currentValue += char;
+                }
+            }
+
+            // 添加最後一個值
+            values.push(currentValue.trim());
+
+            return values;
+        }
+
+        // 更新薪酬數據UI - 修復版
         function updateSalaryUI(data) {
             const container = document.getElementById('salary-accordion');
 
@@ -1041,81 +1245,134 @@
             let totalSalary = 0;
             let salaryCount = 0;
 
+            // 調試：輸出第一個項目查看結構
+            // console.log('Salary data structure:', data[0]);
+            // console.log('All salary data:', data);
+
             data.forEach(item => {
-                const year = item.年份 || '未知年份';
-                const period = item.期間 || '未知期間';
-                const position = item.職位類別 || '未知職位';
-                const salary = parseFloat(item['政府委聘Ｔ合約員工的每月平均人均開支 (調低至最接近的千元（港幣）)']) || 0;
+                // 處理年份 - 嘗試多個可能的字段名
+                const year = item['年份'] || item['Year'] || item['year'] || item['YEAR'] || '未知年份';
 
-                years.add(year);
-                positions.add(position);
-                totalSalary += salary;
-                salaryCount++;
+                // 處理期間 - 嘗試多個可能的字段名
+                const period = item['期間'] || item['Period'] || item['period'] || item['PERIOD'] || '未知期間';
 
-                const key = `${year} (${period})`;
-                if (!groupedData[key]) {
-                    groupedData[key] = [];
+                // 處理職位類別 - 嘗試多個可能的字段名
+                const position = item['職位類別'] || item['職位'] || item['Position'] || item['position'] || '未知職位';
+
+                // 處理薪酬 - 嘗試多個可能的字段名
+                const salaryText = item['政府委聘Ｔ合約員工的每月平均人均開支 (調低至最接近的千元（港幣）)'] ||
+                    item['每月平均人均開支'] ||
+                    item['Salary'] ||
+                    item['salary'] ||
+                    '0';
+
+                // 清理薪酬數值：移除非數字字符，只保留數字
+                const salaryMatch = salaryText.match(/\d+/);
+                const salary = salaryMatch ? parseInt(salaryMatch[0]) : 0;
+
+                // console.log(`Parsed item - Year: ${year}, Period: ${period}, Position: ${position}, Salary: ${salary} from "${salaryText}"`);
+
+                if (year !== '未知年份' && salary > 0) {
+                    years.add(year);
+                    positions.add(position);
+                    totalSalary += salary;
+                    salaryCount++;
+
+                    const key = `${year}年 (${period})`;
+                    if (!groupedData[key]) {
+                        groupedData[key] = [];
+                    }
+                    groupedData[key].push({
+                        position: position,
+                        salary: salary
+                    });
                 }
-                groupedData[key].push({
-                    position: position,
-                    salary: salary
-                });
             });
+
+            // console.log('Grouped data:', groupedData);
+            // console.log('Years:', Array.from(years));
+            // console.log('Positions:', Array.from(positions));
+            // console.log('Total salary:', totalSalary, 'Count:', salaryCount);
 
             // 更新統計
             document.getElementById('total-salary-years').textContent = years.size;
             document.getElementById('total-positions').textContent = positions.size;
             document.getElementById('avg-salary').textContent = salaryCount > 0 ?
-                Math.round(totalSalary / salaryCount).toLocaleString() : '0';
+                Math.round(totalSalary / salaryCount).toLocaleString('zh-HK') + ' HKD' : '0 HKD';
+
+            // 檢查是否有數據
+            if (Object.keys(groupedData).length === 0) {
+                container.innerHTML = `
+            <div class="no-data">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>沒有有效的薪酬數據</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">請確認數據源格式是否正確</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">原始數據示例：${JSON.stringify(data[0] || {})}</p>
+            </div>
+        `;
+                return;
+            }
 
             // 生成HTML
             let accordionHTML = '';
-            Object.keys(groupedData).sort((a, b) => b.localeCompare(a)).forEach((groupKey, index) => {
+            const sortedKeys = Object.keys(groupedData).sort((a, b) => {
+                // 按年份降序排序
+                const yearA = parseInt(a.match(/\d+/)?.[0] || 0);
+                const yearB = parseInt(b.match(/\d+/)?.[0] || 0);
+                return yearB - yearA;
+            });
+
+            sortedKeys.forEach((groupKey, index) => {
                 const items = groupedData[groupKey];
 
                 accordionHTML += `
-                    <div class="data-group">
-                        <div class="data-header-group" onclick="toggleDataGroup('salary', ${index})">
-                            <div>
-                                <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
-                                <span>${groupKey} (${items.length} 個職位)</span>
-                            </div>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div id="salary-group-${index}" class="data-content" style="display: none;">
-                            <div class="data-meta" style="margin-bottom: 15px;">
-                                <span class="data-badge badge-salary">
-                                    <i class="fas fa-money-bill-wave" style="margin-right: 4px;"></i>
-                                    職位類別: ${new Set(items.map(item => item.position)).size}
-                                </span>
-                            </div>
-                            <div class="data-list">
-                `;
+            <div class="data-group">
+                <div class="data-header-group" onclick="toggleDataGroup('salary', ${index})">
+                    <div>
+                        <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
+                        <span>${groupKey} (${items.length} 個職位)</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="salary-group-${index}" class="data-content" style="display: none;">
+                    <div class="data-meta" style="margin-bottom: 15px;">
+                        <span class="data-badge badge-salary">
+                            <i class="fas fa-money-bill-wave" style="margin-right: 4px;"></i>
+                            職位類別: ${new Set(items.map(item => item.position)).size}
+                        </span>
+                        <span class="data-badge badge-salary">
+                            <i class="fas fa-hashtag" style="margin-right: 4px;"></i>
+                            記錄數: ${items.length}
+                        </span>
+                    </div>
+                    <div class="data-list">
+        `;
 
-                items.sort((a, b) => b.salary - a.salary).forEach(item => {
+                // 按薪酬降序排序
+                items.sort((a, b) => b.salary - a.salary).forEach((item, itemIndex) => {
                     accordionHTML += `
-                        <div class="data-item">
-                            <div class="data-info">
-                                <div>
-                                    <div class="data-row">
-                                        <div class="data-label">職位類別:</div>
-                                        <div class="data-value">${item.position}</div>
-                                    </div>
-                                    <div class="data-row">
-                                        <div class="data-label">每月平均開支:</div>
-                                        <div class="data-value">HKD ${item.salary.toLocaleString()}</div>
-                                    </div>
-                                </div>
+                <div class="data-item">
+                    <div class="data-info">
+                        <div>
+                            <div class="data-row">
+                                <div class="data-label">職位類別:</div>
+                                <div class="data-value">${item.position}</div>
                             </div>
-                        </div>
-                    `;
-                });
-
-                accordionHTML += `
+                            <div class="data-row">
+                                <div class="data-label">每月平均開支:</div>
+                                <div class="data-value">HKD ${item.salary.toLocaleString('zh-HK')}</div>
                             </div>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
+                });
+
+                accordionHTML += `
+                    </div>
+                </div>
+            </div>
+        `;
             });
 
             container.innerHTML = accordionHTML;
@@ -1140,9 +1397,11 @@
             let rateCount = 0;
 
             data.forEach(item => {
-                const year = item.年份 || '未知年份';
-                const effectiveDate = item.生效日期 || '未知日期';
-                const rate = parseFloat(item['T合約承辦商的服務費調整百份比'].replace('%', '')) || 0;
+                const year = item.year || item['年份'] || '未知年份';
+                const effectiveDate = item['生效日期'] || '未知日期';
+                const rateText = item['T合約承辦商的服務費調整百份比'] || '0%';
+                // 移除百分比符號並轉換為數字
+                const rate = parseFloat(rateText.replace('%', '').replace(',', '.')) || 0;
 
                 years.add(year);
                 totalRate += rate;
@@ -1153,20 +1412,22 @@
                 }
                 groupedData[year].push({
                     effectiveDate: effectiveDate,
-                    rate: rate
+                    rate: rate,
+                    rateText: rateText
                 });
             });
 
             // 更新統計
             document.getElementById('total-rate-years').textContent = years.size;
             document.getElementById('total-adjustments').textContent = data.length;
-            document.getElementById('avg-rate').textContent = rateCount > 0 ?
-                (totalRate / rateCount).toFixed(2) + '%' : '0%';
+            const avgRate = rateCount > 0 ? (totalRate / rateCount).toFixed(2) : 0;
+            document.getElementById('avg-rate').textContent = avgRate + '%';
 
             // 生成HTML
             let accordionHTML = '';
             Object.keys(groupedData).sort((a, b) => b - a).forEach((year, index) => {
                 const items = groupedData[year];
+                const yearAvgRate = items.reduce((sum, item) => sum + item.rate, 0) / items.length;
 
                 accordionHTML += `
                     <div class="data-group">
@@ -1181,7 +1442,7 @@
                             <div class="data-meta" style="margin-bottom: 15px;">
                                 <span class="data-badge badge-rate">
                                     <i class="fas fa-percentage" style="margin-right: 4px;"></i>
-                                    平均調整: ${(items.reduce((sum, item) => sum + item.rate, 0) / items.length).toFixed(2)}%
+                                    平均調整: ${yearAvgRate.toFixed(2)}%
                                 </span>
                             </div>
                             <div class="data-list">
@@ -1202,7 +1463,7 @@
                                     </div>
                                     <div class="data-row">
                                         <div class="data-label">調整百分比:</div>
-                                        <div class="data-value">${item.rate}%</div>
+                                        <div class="data-value">${item.rateText}</div>
                                     </div>
                                 </div>
                             </div>
@@ -1236,18 +1497,20 @@
             const groupedData = {};
             const years = new Set();
             let maxEmployees = 0;
+            let totalEmployees = 0;
 
             data.forEach(item => {
-                const year = item.年份 || '未知年份';
-                const month = item.月份 || '未知月份';
-                const total = parseInt(item['政府聘用T合約員工的總數']) || 0;
-                const digitalOffice = parseInt(item['數字政策辦公室聘用的T合約員工數目']) || 0;
-                const otherDepartments = parseInt(item['其他局／部門聘用的T合約員工數目']) || 0;
+                const year = item.year || item['年份'] || '未知年份';
+                const month = item.month || item['月份'] || '未知月份';
+                const total = parseInt(item['政府聘用T合約員工的總數'] || '0') || 0;
+                const digitalOffice = parseInt(item['數字政策辦公室聘用的T合約員工數目'] || '0') || 0;
+                const otherDepartments = parseInt(item['其他局／部門聘用的T合約員工數目'] || '0') || 0;
 
                 years.add(year);
                 maxEmployees = Math.max(maxEmployees, total);
+                totalEmployees += total;
 
-                const key = `${year}年${month}月`;
+                const key = `${year}年 (${month}月)`;
                 groupedData[key] = {
                     year: year,
                     month: month,
@@ -1328,6 +1591,153 @@
             container.innerHTML = accordionHTML;
         }
 
+        // 更新員工福利數據UI
+        function updateBenefitUI(data) {
+            const container = document.getElementById('benefit-accordion');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fas fa-heart"></i><p>沒有員工福利數據</p></div>';
+                document.getElementById('total-benefit-years').textContent = '0';
+                document.getElementById('total-benefit-records').textContent = '0';
+                document.getElementById('avg-providers').textContent = '0';
+                return;
+            }
+
+            // 分組數據
+            const groupedData = {};
+            const years = new Set();
+            let totalProviders = 0;
+            let recordCount = 0;
+
+            data.forEach(item => {
+                const year = item.year || item['年份'] || '未知年份';
+                const month = item.month || item['月份'] || '未知月份';
+
+                // 解析數字數據
+                const medicalProviders = parseInt(item['提供門診及住院醫療保障的T合約承辦商數目'] || '0') || 0;
+                const leave8to9Providers = parseInt(item['提供最少8-9天有薪年假的T合約承辦商數目'] || '0') || 0;
+                const leave10PlusProviders = parseInt(item['提供10天或以上有薪年假的T合約承辦商數目'] || '0') || 0;
+                const longServiceProviders = parseInt(item['提供長期服務獎的T合約承辦商數目'] || '0') || 0;
+                const trainingProviders = parseInt(item['提供免費網上學習課程及分享最新科技資訊的T合約承辦商數目'] || '0') || 0;
+
+                years.add(year);
+                totalProviders += medicalProviders + leave8to9Providers + leave10PlusProviders + longServiceProviders + trainingProviders;
+                recordCount += 5; // 5種福利類型
+
+                const key = `${year}年 (${month}月)`;
+                groupedData[key] = {
+                    year: year,
+                    month: month,
+                    medicalProviders: medicalProviders,
+                    leave8to9Providers: leave8to9Providers,
+                    leave10PlusProviders: leave10PlusProviders,
+                    longServiceProviders: longServiceProviders,
+                    trainingProviders: trainingProviders
+                };
+            });
+
+            // 更新統計
+            document.getElementById('total-benefit-years').textContent = years.size;
+            document.getElementById('total-benefit-records').textContent = data.length;
+            document.getElementById('avg-providers').textContent = data.length > 0 ?
+                Math.round(totalProviders / (data.length * 5)) : '0';
+
+            // 生成HTML
+            let accordionHTML = '';
+            const sortedKeys = Object.keys(groupedData).sort((a, b) => {
+                const dateA = groupedData[a];
+                const dateB = groupedData[b];
+                return (parseInt(dateB.year) - parseInt(dateA.year)) ||
+                    (parseInt(dateB.month) - parseInt(dateA.month));
+            });
+
+            sortedKeys.forEach((key, index) => {
+                const item = groupedData[key];
+                const totalBenefits = item.medicalProviders + item.leave8to9Providers + item.leave10PlusProviders +
+                    item.longServiceProviders + item.trainingProviders;
+
+                accordionHTML += `
+                    <div class="data-group">
+                        <div class="data-header-group" onclick="toggleDataGroup('benefit', ${index})">
+                            <div>
+                                <i class="fas fa-heart" style="margin-right: 8px;"></i>
+                                <span>${key}</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="benefit-group-${index}" class="data-content" style="display: none;">
+                            <div class="data-meta" style="margin-bottom: 15px;">
+                                <span class="data-badge badge-benefit">
+                                    <i class="fas fa-clinic-medical" style="margin-right: 4px;"></i>
+                                    總福利項目: ${totalBenefits} 個承辦商
+                                </span>
+                            </div>
+                            
+                            <div class="benefit-grid">
+                                <div class="benefit-item">
+                                    <div class="benefit-label">醫療保障</div>
+                                    <div class="benefit-value">${item.medicalProviders}</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-label">8-9天年假</div>
+                                    <div class="benefit-value">${item.leave8to9Providers}</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-label">10天以上年假</div>
+                                    <div class="benefit-value">${item.leave10PlusProviders}</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-label">長期服務獎</div>
+                                    <div class="benefit-value">${item.longServiceProviders}</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-label">培訓課程</div>
+                                    <div class="benefit-value">${item.trainingProviders}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-list" style="margin-top: 20px;">
+                                <div class="data-item">
+                                    <div class="data-info">
+                                        <div>
+                                            <div class="data-row">
+                                                <div class="data-label">年份:</div>
+                                                <div class="data-value">${item.year}年 (${item.month}月)</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="data-row">
+                                                <div class="data-label">提供醫療保障的承辦商:</div>
+                                                <div class="data-value">${item.medicalProviders} 個</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">提供8-9天年假的承辦商:</div>
+                                                <div class="data-value">${item.leave8to9Providers} 個</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">提供10天以上年假的承辦商:</div>
+                                                <div class="data-value">${item.leave10PlusProviders} 個</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">提供長期服務獎的承辦商:</div>
+                                                <div class="data-value">${item.longServiceProviders} 個</div>
+                                            </div>
+                                            <div class="data-row">
+                                                <div class="data-label">提供培訓課程的承辦商:</div>
+                                                <div class="data-value">${item.trainingProviders} 個</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = accordionHTML;
+        }
+
         // 切換數據群組
         function toggleDataGroup(dataType, index) {
             const content = document.getElementById(`${dataType}-group-${index}`);
@@ -1355,6 +1765,12 @@
                 return new Date(parts[2], parts[1] - 1, parts[0]);
             }
 
+            // 嘗試解析YYYY-MM-DD格式
+            const isoParts = dateStr.split('-');
+            if (isoParts.length === 3) {
+                return new Date(isoParts[0], isoParts[1] - 1, isoParts[2]);
+            }
+
             return new Date(dateStr);
         }
 
@@ -1364,6 +1780,7 @@
                 case 'salary': return '薪酬';
                 case 'rate': return '服務費調整';
                 case 'count': return '員工數量';
+                case 'benefit': return '員工福利';
                 default: return '數據';
             }
         }
@@ -1395,19 +1812,15 @@
         }
 
         // 自動更新數據（如果啟用）
-        let autoRefreshInterval = null;
         document.getElementById('autoRefresh').addEventListener('change', function () {
-            if (this.checked) {
+            if (this.checked && CACHE[currentDataSource]) {
+                // 設置30分鐘自動刷新
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                }
                 autoRefreshInterval = setInterval(() => {
-                    if (CACHE[currentDataSource]) {
-                        const cachedAge = Date.now() - CACHE.lastUpdated[currentDataSource];
-                        const cacheMaxAge = 30 * 60 * 1000; // 30分鐘
-
-                        if (cachedAge > cacheMaxAge) {
-                            loadData();
-                        }
-                    }
-                }, 60000); // 每分鐘檢查一次
+                    loadData();
+                }, 30 * 60 * 1000); // 30分鐘
             } else if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
@@ -1417,7 +1830,7 @@
         // 初始化教程
         if (!localStorage.getItem('tContractTutorialShown')) {
             setTimeout(() => {
-                alert("歡迎使用「T合約員工」查詢系統！\n\n• 選擇數據類型查看不同統計資料\n• 可使用年份篩選查看特定年份數據\n• 啟用緩存可加快載入速度\n• 點擊標題可展開/收起詳細資訊\n• 系統會自動從香港政府數字政策辦公室獲取最新數據");
+                alert("歡迎使用「T合約員工」查詢系統！\n\n• 選擇數據類型查看不同統計資料\n• 可使用年份篩選查看特定年份數據\n• 啟用緩存可加快載入速度\n• 點擊標題可展開/收起詳細資訊\n• 系統會自動從香港政府數字政策辦公室獲取最新數據\n\n新增功能：員工福利數據查詢，顯示承辦商提供的各項福利統計");
                 localStorage.setItem('tContractTutorialShown', 'true');
             }, 1000);
         }
